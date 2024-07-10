@@ -3,7 +3,6 @@ from pathlib import Path
 
 from language import en, ru, el
 
-
 # Absolut path
 dir_path = Path.cwd()
 path = Path(dir_path, 'config', 'config.ini')
@@ -27,5 +26,4 @@ LANGUAGES = {
 }
 DEFAULT_LANGUAGE = 'en'
 
-SLEEP = 60  # How often will be check db and sent msgs (sec)
-
+SLEEP = 300  # How often will be check db and sent msgs (sec)
