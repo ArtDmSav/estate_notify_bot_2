@@ -95,7 +95,7 @@ async def get_active_users() -> User:
     async with async_session() as session:
         async with session.begin():
             result = await session.execute(
-                select(User).where(User.status is True)
+                select(User).where(User.status == True)
             )
             active_users = result.scalars().all()
             return active_users
@@ -135,3 +135,39 @@ async def update_last_msg_id(chat_id, last_msg_id) -> None:
             )
             await session.execute(stmt)
             await session.commit()
+
+
+# Admin functions
+# ----------------------------------------------
+
+async def get_last_10_estate_ids():
+    async with async_session() as session:
+        async with session.begin():
+            result = await session.execute(
+                select(Estate.id).order_by(Estate.id.desc()).limit(10)
+            )
+            last_10_ids = result.scalars().all()
+            return last_10_ids
+
+
+async def get_estate_by_id(estate_id: int):
+    async with async_session() as session:
+        async with session.begin():
+            result = await session.execute(
+                select(Estate).where(Estate.id == estate_id)
+            )
+            estate = result.scalar_one_or_none()
+            return estate
+
+
+async def get_estate_by_group_id_and_msg_id(group_id: str, msg_id: int):
+    async with async_session() as session:
+        async with session.begin():
+            result = await session.execute(
+                select(Estate).where(
+                    (Estate.group_id == group_id) &
+                    (Estate.msg_id == msg_id)
+                )
+            )
+            estate = result.scalar_one_or_none()
+            return estate
