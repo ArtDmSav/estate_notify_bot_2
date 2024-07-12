@@ -210,9 +210,13 @@ async def update_loop(application: Application) -> None:
         print(f'================== --- {count} --- ==================')
         users = await get_active_users()
         for user in users:
+            flag = False
+            print(f'user = {user}')
             last_msg_id = user.last_msg_id
             estates = await get_estates(user.last_msg_id, user.city, user.min_price, user.max_price)
             for estate in estates:
+                flag = True
+                print(f'estate = {estate}')
                 last_msg_id = estate.id
                 print('estate_id = ', estate.id)
                 lang = LANGUAGES[user.language]
@@ -227,6 +231,15 @@ async def update_loop(application: Application) -> None:
                 try:
                     await application.bot.send_message(chat_id=user.chat_id,
                                                        text=f'{msg}{lang.LINK_TO_ADD}{estate.url}{lang.STOP_UPDATE}')
+
+                except TelegramError as e:
+                    await deactivate_user(user.chat_id)
+                    print(f"------------------------{e}----------------------")
+            if flag:
+                try:
+                    lang = LANGUAGES[user.language]
+                    await application.bot.send_message(chat_id=user.chat_id,
+                                                       text=f'{lang.STOP_UPDATE}{lang.PARAM}')
 
                 except TelegramError as e:
                     await deactivate_user(user.chat_id)
