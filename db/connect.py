@@ -1,6 +1,6 @@
 import logging
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, func
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
@@ -18,7 +18,18 @@ async_session = sessionmaker(
 )
 
 
+async def get_last_estate_id() -> int:
+    async with async_session() as session:
+        async with session.begin():
+            result = await session.execute(
+                select(func.max(Estate.id))
+            )
+            last_id = result.scalar_one_or_none()
+            return last_id if last_id is not None else 0
+
+
 async def insert_user_tg(chat_id: int, city: str, min_value: int, max_value: int, language: str, status: bool = True):
+    last_estate_id = await get_last_estate_id()
     async with async_session() as session:
         async with session.begin():
             # Поиск пользователя по chat_id
@@ -37,7 +48,8 @@ async def insert_user_tg(chat_id: int, city: str, min_value: int, max_value: int
                         min_price=min_value,
                         max_price=max_value,
                         status=status,
-                        language=language
+                        language=language,
+                        last_msg_id=last_estate_id
                     )
                 )
                 await session.execute(stmt)
@@ -49,7 +61,8 @@ async def insert_user_tg(chat_id: int, city: str, min_value: int, max_value: int
                     min_price=min_value,
                     max_price=max_value,
                     status=status,
-                    language=language
+                    language=language,
+                    last_msg_id=last_estate_id
                 )
                 session.add(new_user)
             await session.commit()

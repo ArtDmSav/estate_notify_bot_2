@@ -145,6 +145,7 @@ async def max_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             context.user_data['max_value'], context.user_data['min_value'] = context.user_data['min_value'], max_value
         else:
             context.user_data['max_value'] = max_value
+
         await insert_user_tg(update.message.chat_id,
                              context.user_data['city'],
                              int(context.user_data['min_value']),
