@@ -51,7 +51,7 @@ async def set_param(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def set_city_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user_language = context.user_data.get('language', DEFAULT_LANGUAGE)
     lang = LANGUAGES[user_language]
-    deactivate = await deactivate_user(update.message.chat_id)
+    await deactivate_user(update.message.chat_id)
 
     reply_markup = InlineKeyboardMarkup([
         [InlineKeyboardButton(lang.LARNAKA, callback_data="larnaka"),
@@ -187,8 +187,8 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(lang.INFO_BOT)
 
 
-async def set_bot_commands(application: Application, language: str) -> None:
-    lang = LANGUAGES[language]
+async def set_bot_commands(application: Application, language_code: str) -> None:
+    lang = LANGUAGES[language_code]
     # lang = 'en'
 
     commands = [

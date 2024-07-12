@@ -4,11 +4,12 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
+from config.data import DB_LOGIN, DB_PASSWORD, DB_NAME
 from .create import Estate, User
 
 logging.getLogger('sqlalchemy.engine').setLevel(logging.WARNING)
 
-DATABASE_URL = "postgresql+asyncpg://admin:password@localhost/estate"
+DATABASE_URL = f"postgresql+asyncpg://{DB_LOGIN}:{DB_PASSWORD}@localhost/{DB_NAME}"
 
 # Создание асинхронного двигателя и фабрики сессий
 engine = create_async_engine(DATABASE_URL, echo=False)
@@ -81,7 +82,7 @@ async def get_active_users() -> User:
     async with async_session() as session:
         async with session.begin():
             result = await session.execute(
-                select(User).where(User.status == True)
+                select(User).where(User.status is True)
             )
             active_users = result.scalars().all()
             return active_users
@@ -90,11 +91,11 @@ async def get_active_users() -> User:
 async def get_user_language(chat_id: str) -> str:
     async with async_session() as session:
         async with session.begin():
-            language = await session.execute(
+            result = await session.execute(
                 select(User.language).where(User.chat_id == chat_id)
             )
+            language = result.scalar_one_or_none()
             return language if language is not None else ''
-
 
 async def get_estates(last_estate_id, city, min_price, max_price):
     async with async_session() as session:

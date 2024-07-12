@@ -1,12 +1,15 @@
+from datetime import datetime
+
+from databases import Database
 from sqlalchemy import (
-    Column, Integer, BigInteger, String, Boolean, DateTime, Text, Time, func, UniqueConstraint
+    Column, Integer, BigInteger, String, Boolean, DateTime, Text, Time
 )
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import declarative_base
-from datetime import datetime
-from databases import Database
 
-DATABASE_URL = "postgresql+asyncpg://admin:password@localhost/estate"
+from config.data import DB_LOGIN, DB_PASSWORD, DB_NAME
+
+DATABASE_URL = f"postgresql+asyncpg://{DB_LOGIN}:{DB_PASSWORD}@localhost/{DB_NAME}"
 
 database = Database(DATABASE_URL)
 Base = declarative_base()
