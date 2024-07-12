@@ -8,7 +8,7 @@ from telegram.ext import CallbackQueryHandler, Application, CommandHandler, Cont
 
 from config.data import BOT_TOKEN, LANGUAGES, DEFAULT_LANGUAGE
 from db.connect import insert_user_tg, deactivate_user, get_active_users, get_estates, update_last_msg_id, \
-    get_user_language
+    get_user_language, get_last_10_estate_ids, get_estate_by_id, get_estate_by_group_id_and_msg_id
 
 CITY, MIN_VALUE, MAX_VALUE = range(3)
 
@@ -203,6 +203,35 @@ async def set_bot_commands(application: Application, language_code: str) -> None
     await application.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
 
 
+async def get_last_10_eids(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    eids = await get_last_10_estate_ids()
+    await update.message.reply_text(eids)
+
+
+async def get_estate_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    parts = update.message.text.split()
+
+    estate = await get_estate_by_id(int(parts[1]))
+    await update.message.reply_text(f'{estate.msg}\n{estate.url}')
+
+
+async def get_estate_group_msg_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    parts = update.message.text.split()
+    print(parts)
+    # Получение двух значений после команды
+    if len(parts) >= 3:
+        group_id = parts[1]
+        msg_id = int(parts[2])
+        print(group_id, '\n', msg_id)
+        estate = await get_estate_by_group_id_and_msg_id(group_id, msg_id)
+        print(estate)
+        if estate:
+            print(f'{estate.msg}\n{estate.url}')
+            await update.message.reply_text(f'{estate.msg}\n{estate.url}')
+    else:
+        await update.message.reply_text("error")
+
+
 async def update_loop(application: Application) -> None:
     count = 0
     while True:
@@ -211,12 +240,11 @@ async def update_loop(application: Application) -> None:
         users = await get_active_users()
         for user in users:
             flag = False
-            print(f'user = {user}')
+            print(f'user = {user.chat_id}')
             last_msg_id = user.last_msg_id
             estates = await get_estates(user.last_msg_id, user.city, user.min_price, user.max_price)
             for estate in estates:
                 flag = True
-                print(f'estate = {estate}')
                 last_msg_id = estate.id
                 print('estate_id = ', estate.id)
                 lang = LANGUAGES[user.language]
@@ -275,6 +303,11 @@ def main() -> None:
     application.add_handler(CommandHandler('info', info))
     application.add_handler(CommandHandler('stop', stop))
     application.add_handler(CommandHandler('language', language))
+
+    # Admin command
+    application.add_handler(CommandHandler('eid', get_last_10_eids))
+    application.add_handler(CommandHandler('msgid', get_estate_id))
+    application.add_handler(CommandHandler('groupid', get_estate_group_msg_id))
     application.add_handler(CallbackQueryHandler(set_language, pattern='^lang_(en|el|ru)$'))
 
     application.add_handler(conv_handler)
