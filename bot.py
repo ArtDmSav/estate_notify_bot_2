@@ -7,7 +7,8 @@ from telegram.ext import CallbackQueryHandler, Application, CommandHandler, Cont
     ConversationHandler
 
 from config.data import BOT_TOKEN, LANGUAGES, DEFAULT_LANGUAGE
-from db.connect import insert_user_tg, deactivate_user, get_active_users, get_estates, update_last_msg_id
+from db.connect import insert_user_tg, deactivate_user, get_active_users, get_estates, update_last_msg_id, \
+    get_user_language
 
 CITY, MIN_VALUE, MAX_VALUE = range(3)
 
@@ -15,7 +16,8 @@ CITY, MIN_VALUE, MAX_VALUE = range(3)
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data['conversation'] = 'start'
     if 'language' not in context.user_data:
-        context.user_data['language'] = DEFAULT_LANGUAGE
+        lang_code = await get_user_language(update.message.chat_id)
+        context.user_data['language'] = lang_code if lang_code else DEFAULT_LANGUAGE
     lang = LANGUAGES[context.user_data['language']]
     await update.message.reply_text(lang.LANGUAGE_SET)
     return await set_param(update, context)
@@ -66,8 +68,9 @@ async def set_city_selection(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 
 async def set_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    user_language = context.user_data['language']
-    lang = LANGUAGES[user_language]
+    if 'language' not in context.user_data:
+        lang_code = await get_user_language(update.message.chat_id)
+        context.user_data['language'] = lang_code if lang_code else DEFAULT_LANGUAGE
 
     query = update.callback_query
     await query.answer()
@@ -76,7 +79,6 @@ async def set_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     await query.delete_message()
     # await query.edit_message_reply_markup(reply_markup=None)
-    # await query.edit_message_text(text="")
 
     return await set_min_price(update, context)
 

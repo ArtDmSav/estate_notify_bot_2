@@ -87,6 +87,15 @@ async def get_active_users() -> User:
             return active_users
 
 
+async def get_user_language(chat_id: str) -> str:
+    async with async_session() as session:
+        async with session.begin():
+            language = await session.execute(
+                select(User.language).where(User.chat_id == chat_id)
+            )
+            return language if language is not None else ''
+
+
 async def get_estates(last_estate_id, city, min_price, max_price):
     async with async_session() as session:
         async with session.begin():
