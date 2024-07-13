@@ -157,7 +157,7 @@ async def max_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             f"{lang.CONFIRMATION_MSG} \n\n"
             f"{lang.CITY}: {citys[context.user_data['city']]} \n"
             f"{lang.MIN_PRICE} {context.user_data['min_value']}€ "
-            f"{lang.MAX_PRICE} {context.user_data['max_value']}€{lang.STOP_UPDATE}{lang.PARAM}",
+            f"{lang.MAX_PRICE} {context.user_data['max_value']}€\n{lang.STOP_UPDATE}{lang.PARAM}",
             reply_markup=ReplyKeyboardRemove()
         )
         return ConversationHandler.END
@@ -258,7 +258,7 @@ async def update_loop(application: Application) -> None:
                         msg = estate.msg_el
                 try:
                     await application.bot.send_message(chat_id=user.chat_id,
-                                                       text=f'{msg}{lang.LINK_TO_ADD}{estate.url}{lang.STOP_UPDATE}')
+                                                       text=f'{msg}{lang.LINK_TO_ADD}{estate.url}')
 
                 except TelegramError as e:
                     await deactivate_user(user.chat_id)
