@@ -6,18 +6,27 @@ from telegram.error import TelegramError
 from telegram.ext import CallbackQueryHandler, Application, CommandHandler, ContextTypes, MessageHandler, filters, \
     ConversationHandler
 
-from config.data import BOT_TOKEN, LANGUAGES, DEFAULT_LANGUAGE
+from config.data import BOT_TOKEN, LANGUAGES, DEFAULT_LANGUAGE, ADMIN
 from db.connect import insert_user_tg, deactivate_user, get_active_users, get_estates, update_last_msg_id, \
-    get_user_language, get_last_10_estate_ids, get_estate_by_id, get_estate_by_group_id_and_msg_id
+    get_user_language, get_last_10_estate_ids, get_estate_by_id, get_estate_by_group_id_and_msg_id, get_user_by_chat_id, \
+    get_estates_in_time_range, update_user_language
 
 CITY, MIN_VALUE, MAX_VALUE = range(3)
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    context.user_data['conversation'] = 'start'
+async def set_lang(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if 'language' not in context.user_data:
-        lang_code = await get_user_language(update.message.chat_id)
+        try:
+            lang_code = await get_user_language(update.message.chat_id)
+        except AttributeError:
+            lang_code = await get_user_language(update.callback_query.from_user.id)
+
         context.user_data['language'] = lang_code if lang_code else DEFAULT_LANGUAGE
+
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await set_lang(update, context)
+
     lang = LANGUAGES[context.user_data['language']]
     await update.message.reply_text(lang.LANGUAGE_SET)
     return await set_param(update, context)
@@ -30,6 +39,7 @@ async def language(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         [InlineKeyboardButton("Русский", callback_data='lang_ru')]
     ]
     reply_markup = InlineKeyboardMarkup(lang_kb)
+    # I'm special stay en version in this place
     await update.message.reply_text("Please choose your language:", reply_markup=reply_markup)
 
 
@@ -38,19 +48,19 @@ async def set_language(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await query.answer()
     choice = query.data
     context.user_data['language'] = choice.split('_')[1]
-
+    await update_user_language(update.callback_query.from_user.id, context.user_data['language'])
     lang = LANGUAGES[context.user_data['language']]
     await update.callback_query.edit_message_text(lang.CHANGE_LANGUAGE)
 
 
 async def set_param(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await set_lang(update, context)
     context.user_data['conversation'] = 'param'
     return await set_city_selection(update, context)
 
 
 async def set_city_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    user_language = context.user_data.get('language', DEFAULT_LANGUAGE)
-    lang = LANGUAGES[user_language]
+    lang = LANGUAGES[context.user_data['language']]
     await deactivate_user(update.message.chat_id)
 
     reply_markup = InlineKeyboardMarkup([
@@ -68,10 +78,6 @@ async def set_city_selection(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 
 async def set_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    if 'language' not in context.user_data:
-        lang_code = await get_user_language(update.message.chat_id)
-        context.user_data['language'] = lang_code if lang_code else DEFAULT_LANGUAGE
-
     query = update.callback_query
     await query.answer()
 
@@ -84,8 +90,7 @@ async def set_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def set_min_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    user_language = context.user_data['language']
-    lang = LANGUAGES[user_language]
+    lang = LANGUAGES[context.user_data['language']]
 
     keyboard = [['100', '300', '500', '700', '1000'],
                 ['1200', '1400', '1600', '1800', '2000'],
@@ -101,8 +106,7 @@ async def set_min_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 
 
 async def min_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    user_language = context.user_data['language']
-    lang = LANGUAGES[user_language]
+    lang = LANGUAGES[context.user_data['language']]
 
     text = update.message.text
 
@@ -128,8 +132,8 @@ async def min_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def max_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    user_language = context.user_data['language']
-    lang = LANGUAGES[user_language]
+    lang = LANGUAGES[context.user_data['language']]
+
     citys = {'larnaka': lang.LARNAKA, 'paphos': lang.PAPHOS, 'nicosia': lang.NICOSIA,
              'limassol': lang.LIMASSOL, 'cyprus': lang.CYPRUS}
     max_value = update.message.text
@@ -167,35 +171,58 @@ async def max_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def invalid_city_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    user_language = context.user_data.get('language', DEFAULT_LANGUAGE)
-    lang = LANGUAGES[user_language]
+    lang = LANGUAGES[context.user_data['language']]
     await update.message.reply_text(lang.INVALID_INPUT_MSG)
     return await set_city_selection(update, context)
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_language = context.user_data.get('language', DEFAULT_LANGUAGE)
-    lang = LANGUAGES[user_language]
+    await set_lang(update, context)
+    lang = LANGUAGES[context.user_data['language']]
+
     if await deactivate_user(update.message.chat_id):
         await update.message.reply_text(lang.UPDATE_STOPPED)
     else:
         await update.message.reply_text(lang.MSG_ERROR)
 
 
+async def get_day_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await set_lang(update, context)
+    lang = LANGUAGES[context.user_data['language']]
+
+    user = await get_user_by_chat_id(update.message.from_user.id)
+    if user:
+        msg = ''
+        match context.user_data['language']:
+            case 'ru':
+                msg = 'msg_ru'
+            case 'en':
+                msg = 'msg_en'
+            case 'el':
+                msg = 'msg_el'
+
+        estates = await get_estates_in_time_range(city=user.city, min_price=user.min_price, max_price=user.max_price,
+                                                  range_time=24, field_msg=msg)
+        for estate in estates:
+            await update.message.reply_text(f'{estate[0]}\n{estate[1]}')
+    else:
+        await update.message.reply_text(lang.ERROR_SET_DATA)
+
+
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_language = context.user_data.get('language', DEFAULT_LANGUAGE)
-    lang = LANGUAGES[user_language]
+    await set_lang(update, context)
+    lang = LANGUAGES[context.user_data['language']]
     await update.message.reply_text(lang.INFO_BOT)
 
 
 async def set_bot_commands(application: Application, language_code: str) -> None:
-    lang = LANGUAGES[language_code]
-    # lang = 'en'
+    lang = LANGUAGES[DEFAULT_LANGUAGE]
 
     commands = [
         BotCommand("start", lang.BOT_START),
         BotCommand("new_parameters", lang.NEW_PARAM),
         BotCommand("language", lang.CHANGE_LANGUAGE_COMMAND),
+        BotCommand("get_day_history", lang.GET_DAY_HISTORY),
         BotCommand("info", lang.INFO_BOT_COMMAND)
     ]
 
@@ -203,33 +230,66 @@ async def set_bot_commands(application: Application, language_code: str) -> None
     await application.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
 
 
+async def admin_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_id = update.message.from_user.id
+    if user_id == ADMIN:
+        menu_text = """
+            Меню администратора:
+            /eid - get last 10 Estate.id Ex: + ''
+            /msgid - get msg with Estate.id Ex: + ' 357'
+            /groupid - get msg with group_id and msg_id Ex: + ' dom_com_cy 105200'
+            /u_list - get user list
+            
+    application.add_handler(CommandHandler('', get_last_10_eids))
+    application.add_handler(CommandHandler('', get_estate_id))
+    application.add_handler(CommandHandler('groupid', get_estate_group_msg_id))
+            """
+        await update.message.reply_text(menu_text)
+    else:
+        await update.message.reply_text('Access ERROR')
+
+
 async def get_last_10_eids(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    eids = await get_last_10_estate_ids()
-    await update.message.reply_text(eids)
+    user_id = update.message.from_user.id
+    if user_id == ADMIN:
+        eids = await get_last_10_estate_ids()
+        await update.message.reply_text(eids)
+    else:
+        await update.message.reply_text('Access ERROR')
 
 
 async def get_estate_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    parts = update.message.text.split()
+    user_id = update.message.from_user.id
+    if user_id == ADMIN:
 
-    estate = await get_estate_by_id(int(parts[1]))
-    await update.message.reply_text(f'{estate.msg}\n{estate.url}')
+        parts = update.message.text.split()
+
+        estate = await get_estate_by_id(int(parts[1]))
+        await update.message.reply_text(f'{estate.msg}\n{estate.url}')
+    else:
+        await update.message.reply_text('Access ERROR')
 
 
 async def get_estate_group_msg_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    parts = update.message.text.split()
-    print(parts)
-    # Получение двух значений после команды
-    if len(parts) >= 3:
-        group_id = parts[1]
-        msg_id = int(parts[2])
-        print(group_id, '\n', msg_id)
-        estate = await get_estate_by_group_id_and_msg_id(group_id, msg_id)
-        print(estate)
-        if estate:
-            print(f'{estate.msg}\n{estate.url}')
-            await update.message.reply_text(f'{estate.msg}\n{estate.url}')
+    user_id = update.message.from_user.id
+    if user_id == ADMIN:
+
+        parts = update.message.text.split()
+        print(parts)
+        # Получение двух значений после команды
+        if len(parts) >= 3:
+            group_id = parts[1]
+            msg_id = int(parts[2])
+            print(group_id, '\n', msg_id)
+            estate = await get_estate_by_group_id_and_msg_id(group_id, msg_id)
+            print(estate)
+            if estate:
+                print(f'{estate.msg}\n{estate.url}')
+                await update.message.reply_text(f'{estate.msg}\n{estate.url}')
+        else:
+            await update.message.reply_text("error")
     else:
-        await update.message.reply_text("error")
+        await update.message.reply_text('Access ERROR')
 
 
 async def update_loop(application: Application) -> None:
@@ -303,12 +363,15 @@ def main() -> None:
     application.add_handler(CommandHandler('info', info))
     application.add_handler(CommandHandler('stop', stop))
     application.add_handler(CommandHandler('language', language))
+    application.add_handler(CommandHandler('get_day_history', get_day_history))
+
+    application.add_handler(CallbackQueryHandler(set_language, pattern='^lang_(en|el|ru)$'))
 
     # Admin command
+    application.add_handler(CommandHandler('admin', admin_commands))
     application.add_handler(CommandHandler('eid', get_last_10_eids))
     application.add_handler(CommandHandler('msgid', get_estate_id))
     application.add_handler(CommandHandler('groupid', get_estate_group_msg_id))
-    application.add_handler(CallbackQueryHandler(set_language, pattern='^lang_(en|el|ru)$'))
 
     application.add_handler(conv_handler)
 
