@@ -26,4 +26,5 @@ LANGUAGE_SET = "Αλλάξτε γλώσσα /language"
 INFO_BOT_COMMAND = "Πληροφορίες για το bot"
 CHANGE_LANGUAGE_COMMAND = 'Αλλάξτε τη γλώσσα του bot'
 PARAM = '\nΟρίστε νέες παραμέτρους /new_parameters'
-
+GET_DAY_HISTORY = 'GET_DAY_HISTORY'
+ERROR_SET_DATA = 'ERROR_SET_DATA /new_parameters'

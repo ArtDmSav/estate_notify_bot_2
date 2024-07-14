@@ -26,3 +26,5 @@ LANGUAGE_SET = "Change language /language"
 INFO_BOT_COMMAND = "Information about the bot"
 CHANGE_LANGUAGE_COMMAND = 'Change the bot language'
 PARAM = '\nSet new parameters /new_parameters'
+GET_DAY_HISTORY = 'GET_DAY_HISTORY'
+ERROR_SET_DATA = 'ERROR_SET_DATA /new_parameters'

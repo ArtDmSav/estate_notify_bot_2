@@ -26,3 +26,5 @@ LANGUAGE_SET = "Поменять язык /language"
 INFO_BOT_COMMAND = "Информация о работе бота"
 CHANGE_LANGUAGE_COMMAND = 'Изменить язык бота'
 PARAM = '\nЗадать новые параметры /new_parameters'
+GET_DAY_HISTORY = 'GET_DAY_HISTORY'
+ERROR_SET_DATA = 'ERROR_SET_DATA /new_parameters'
