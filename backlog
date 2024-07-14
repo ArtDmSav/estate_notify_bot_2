@@ -1,21 +1,22 @@
-add automatic admin login with user id -                                                            done = 100 %
-add admin menu with description -                                                                   done = 100 %
-add buttons witch will be sent estate history for 12 or 24 hours from DB  -                         progress = 60 %
+add automatic admin login with user id -                                                                done = 100 %
+add admin menu with description -                                                                       done = 100 %
+decline msg with len > 4096 (4 short time, i will need make difficult fix func in other prog)           done = 100 %
+add buttons witch will be sent estate history for 24 hours from DB  -                                   done = 100 %
+add language button                                                                                     done = 100 %
+decline/fire msg with len > 4096 (4 short time, i will need make difficult fix func in other prog)      done = 100 %
+make logic model: try(del last msg) -> lang button -> new_parameters -> get_history                     done = 100 %
+                                                   \                 \                                  ------------
+                                           continue get msg      stop update                            ------------
+                                            or get_history                                              ------------
+decline/fire msg with len > 4096 (4 short time, i will need make difficult fix func in other prog)      done = 100 %
 add open link like web apps
-add sheet pet allowed = T/F
-add sheet rooms
-add sheet new building
 add admin command: get_user_list,
-                   post_ad_post(for all subscription with smart algorithm with back notification)
-add fields: User.access, User.username User.end_of_access
-add system promo code access
+                   post_ad_post
 write and rewrite users texts about bot and bot functions
 set command menu just on en lang and add description on diff lang in /about_bot
 
-decline/fire msg with len > 4096 (4 short time, i will need make difficult fix func in other prog)
+add fields: User/Estate.pet = T/F, User/Estate.new_building = T/F,User.access = T/F, User.username = char32,
+            User.end_of_access = DT
+add system promo code access
 
 
-make logic model: try(del last msg) -> lang button -> new_parameters -> get_history
-                                                   \                 \
-                                           continue get msg      stop update
-                                            or get_history
