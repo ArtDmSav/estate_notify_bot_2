@@ -19,12 +19,35 @@ MSG_ERROR = "Error, please try again"
 BOT_START = "Start the bot"
 NEW_PARAM = 'Set new values'
 LANGUAGE_COMMAND = 'Change language'
-INFO_BOT = ("This bot scans multiple rental ad sources every 10 minutes and sends "
-            "you offers based on your parameters.")
 LINK_TO_ADD = '\n------------------------------\nLink to the ad ---> '
 LANGUAGE_SET = "Change language /language"
-INFO_BOT_COMMAND = "Information about the bot"
-CHANGE_LANGUAGE_COMMAND = 'Change the bot language'
 PARAM = '\nSet new parameters /new_parameters'
 GET_DAY_HISTORY = 'GET_DAY_HISTORY'
-ERROR_SET_DATA = 'ERROR_SET_DATA /new_parameters'
+
+INFO_BOT_COMMAND = "Bot Information"
+STOP_UPDATE_COMMAND = "Stop Updates"
+MY_PARAM_COMMAND = "My Parameters"
+GET_HISTORY_COMMAND = "Get Message History"
+CHANGE_LANGUAGE_COMMAND = "Change Language"
+NEW_PARAM_COMMAND = "Set New Values"
+TXT_BEFORE_HISTORY_BT = "You can get the announcement history based on your parameters for the last:"
+GET_DAY_HISTORY_BT = "24 hours"
+DEL_HISTORY_BT = "Thank you, no need"
+ERROR_SET_DATA = ("Search parameters for rentals have not been set yet.\n"
+                  "Please enter the city and price range: /new_parameters")
+CHOOSE_LANGUAGE = "Please choose a language:"
+START_MSG = ("This bot will help you simplify the process of finding rental housing!\n\n"
+             "/info - Detailed information about the functions, rules, and terms of using the bot."
+             "By continuing to use, you agree to the terms of use.")
+INFO_BOT = ("This bot scans numerous open sources for rental listings and sends you offers based on your parameters.\n"
+            "Bot commands:\n"
+            "/new_parameters - Enter new parameters and activate the mailing of new listings based on these parameters.\n"
+            "/language - Change the bot's language and the messages you receive.\n"
+            "/get_history - One-time receipt of listings based on your previously entered parameters for a specified period. This command does not prevent new listings from being received.\n"
+            "/my_parameters - Get the currently set parameters.\n"
+            "/stop - Stop updates and mailing of listings.\n"
+            "We get data from websites: Bazaraki.com and dom.com.cy, as well as from numerous Telegram groups. We sort the listings, highlight the main parameters, translate them into different languages, and control duplicates.\n"
+            "Listings with options: NEW HOUSE (not older than 2 years) and ALLOWED WITH PETS are also displayed if the listing does not contain information about the year of construction and pets.\n"
+            "The bot is free. The information you provide is only used to process listings according to your requests and is not shared with third parties. "
+            "The free version includes advertising materials.\n\n"
+            "In case of incorrect operation, suggestions for improving the bot, or advertising integration, please write to: @UrbanPurr")

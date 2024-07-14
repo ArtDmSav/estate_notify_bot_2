@@ -9,12 +9,12 @@ make logic model: try(del last msg) -> lang button -> new_parameters -> get_hist
                                            continue get msg      stop update                            ------------
                                             or get_history                                              ------------
 decline/fire msg with len > 4096 (4 short time, i will need make difficult fix func in other prog)      done = 100 %
+write and rewrite users texts about bot and bot functions                                               done = 100 %
+set command menu just on en lang and add description on diff lang in /about_bot                         done = 100 %
+add command my_value. remove /start from command menu                                                   done = 100 %
 add open link like web apps
 add admin command: get_user_list,
                    post_ad_post
-write and rewrite users texts about bot and bot functions
-set command menu just on en lang and add description on diff lang in /about_bot
-
 add fields: User/Estate.pet = T/F, User/Estate.new_building = T/F,User.access = T/F, User.username = char32,
             User.end_of_access = DT
 add system promo code access
