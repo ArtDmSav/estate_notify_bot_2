@@ -16,6 +16,7 @@ DB_NAME = config['Database']['db_name']
 
 BOT_TOKEN = config['Telegram']['bot_token']
 BOT_USERNAME = config['Telegram']['bot_username']
+ADMIN = config['Telegram']['admin_1']
 
 WAIT_BF_DEL_CHART_PNG = 3  # second
 
