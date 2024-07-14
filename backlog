@@ -5,5 +5,16 @@ add sheet rooms
 add sheet new building
 add automatic admin login with user id
 add admin command: get_user_list, post_ad_post(for all subscription with smart algorithm with back notification)
-add sheets: User.access, User.username User.end_of_access
+add fields: User.access, User.username User.end_of_access
 add system promo code access
+
+
+logic model: try(del last msg) -> lang button -> new_param
+
+how get task priority?
+- first make that need less write code
+- in last time: everything with add fields (it's difficult and maybe in proces i will need add some more fields)
+
+
+
+
