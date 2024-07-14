@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timedelta
 
 from sqlalchemy import select, update, func
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -110,6 +111,7 @@ async def get_user_language(chat_id: str) -> str:
             language = result.scalar_one_or_none()
             return language if language is not None else ''
 
+
 async def get_estates(last_estate_id, city, min_price, max_price):
     async with async_session() as session:
         async with session.begin():
@@ -132,6 +134,54 @@ async def update_last_msg_id(chat_id, last_msg_id) -> None:
                 update(User).
                 where(User.chat_id == chat_id).
                 values(last_msg_id=last_msg_id)
+            )
+            await session.execute(stmt)
+            await session.commit()
+
+
+async def get_user_by_chat_id(chat_id: int):
+    async with async_session() as session:
+        async with session.begin():
+            result = await session.execute(
+                select(User).where(User.chat_id == chat_id)
+            )
+            user = result.scalar_one_or_none()
+            return user if user is not None else 0
+
+
+async def get_estates_in_time_range(city: str, min_price: int, max_price: int, range_time: int, field_msg: str):
+    async with async_session() as session:
+        async with session.begin():
+            threshold_time = datetime.now() - timedelta(hours=range_time)
+            msg_lang = getattr(Estate, field_msg)
+
+            result = await session.execute(
+                select(msg_lang, Estate.url)
+                .where(
+                    (Estate.datetime >= threshold_time) &
+                    (Estate.city == city) &
+                    (Estate.price >= min_price) &
+                    (Estate.price <= max_price)
+                )
+            )
+            estates = result.all()
+            return estates
+
+
+async def update_user_language(chat_id: int, language: str) -> None:
+    async with async_session() as session:
+        async with session.begin():
+            # Проверка существования пользователя с заданным chat_id
+            result = await session.execute(
+                select(User).where(User.chat_id == chat_id)
+            )
+            user = result.scalar_one_or_none()
+
+            # Обновление языка пользователя
+            stmt = (
+                update(User).
+                where(User.chat_id == chat_id).
+                values(language=language)
             )
             await session.execute(stmt)
             await session.commit()
