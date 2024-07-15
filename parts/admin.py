@@ -30,7 +30,7 @@ async def get_user_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     user_id = update.message.from_user.id
 
     if user_id == ADMIN:
-        users, amount = await get_all_users()
+        users = await get_all_users()
         count = 0
         for user in users:
             count += 1

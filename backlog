@@ -21,7 +21,8 @@ add func my_param                                                               
 ----------------- I'l be back after update other estate bots --------------------
 
 add fields: User/Estate.pet = T/F, User/Estate.new_building = T/F,User.access = T/F,
-            User.username = char32, User.end_of_access = DT, User.blocked = INT, User.advt = T/F
+            User.username = char32, User.end_of_access = DT, User.blocked = INT, User.advt = T/F,
+            User.reg_dt
 add system promo code access
 change sending to users algorithm for distribution load
 
