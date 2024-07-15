@@ -432,7 +432,7 @@ async def update_loop(application: Application) -> None:
                     print(f"------------------------{e}----------------------")
             if flag:
                 try:
-                    lang = LANGUAGES[user.set_language]
+                    lang = LANGUAGES[user.language]
                     await application.bot.send_message(chat_id=user.chat_id,
                                                        text=f'{lang.STOP_UPDATE}{lang.PARAM}')
 
