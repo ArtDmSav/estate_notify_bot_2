@@ -1,7 +1,7 @@
 import re
 
 from telegram import Update, InputMediaVideo, InputMediaPhoto
-from telegram.error import TelegramError
+from telegram.error import TelegramError, Forbidden
 from telegram.ext import ContextTypes
 
 from config.data import ADMIN
@@ -86,6 +86,10 @@ async def post_ad_post(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                     if caption:
                         print('if media =   fals and captio = true')
                         await context.bot.send_message(chat_id=user.chat_id, text=caption)
+
+            except Forbidden as e:
+                await deactivate_user(user.chat_id)
+                print(f"------------------------{e}----------------------")
 
             except TelegramError as e:
                 await deactivate_user(user.chat_id)

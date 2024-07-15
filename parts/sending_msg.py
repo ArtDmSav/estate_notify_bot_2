@@ -1,7 +1,7 @@
 import asyncio
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.error import TelegramError
+from telegram.error import TelegramError, Forbidden
 from telegram.ext import Application
 
 from config.data import LANGUAGES, SLEEP
@@ -40,8 +40,11 @@ async def update_loop(application: Application) -> None:
                         link_kb = InlineKeyboardMarkup([[InlineKeyboardButton(lang.OPEN_LINK, url=estate.url)]])
                         await application.bot.send_message(chat_id=user.chat_id, text=msg_to_sent, reply_markup=link_kb)
 
-                except TelegramError as e:
+                except Forbidden as e:
                     await deactivate_user(user.chat_id)
+                    print(f"------------------------{e}----------------------")
+
+                except TelegramError as e:
                     print(f"------------------------{e}----------------------")
             if flag:
                 try:
