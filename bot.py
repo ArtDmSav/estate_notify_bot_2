@@ -87,6 +87,11 @@ async def set_param(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
                                          message_id=context.user_data['set_language_msg'])
     except Exception as e:
         print(3, e)
+    try:
+        await context.bot.delete_message(chat_id=update.message.from_user.id,
+                                         message_id=context.user_data['set_all_params'])
+    except Exception as e:
+        print(6, e)
     return await set_city_selection(update, context)
 
 
@@ -245,7 +250,7 @@ async def history_bt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     lang = LANGUAGES[context.user_data['language']]
 
     history_kb = [
-        [InlineKeyboardButton(lang.GET_DAY_HISTORY_BT, callback_data='get_day_history_kb')],
+        [InlineKeyboardButton(lang.GET_DAY_HISTORY_BT, callback_data='get_history_kb')],
         [InlineKeyboardButton(lang.DEL_HISTORY_BT, callback_data='del_history_kb')],
     ]
     reply_markup = InlineKeyboardMarkup(history_kb)
@@ -254,7 +259,7 @@ async def history_bt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     context.user_data['history_bt_msg'] = msg.message_id
 
 
-async def get_day_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def get_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await find_and_set_lang(update, context)
     lang = LANGUAGES[context.user_data['language']]
 
@@ -276,7 +281,8 @@ async def get_day_history(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         for estate in estates[0:5]:  # -----------!!!!!!!!!!!!!------------!!!!!!!!!!!!-------!!!!!!!!! TEST
             msg_to_sent = f'{estate[0]}\n{estate[1]}'
             if len(msg_to_sent) <= 4095:
-                await update.message.reply_text(msg_to_sent)
+                link_kb = InlineKeyboardMarkup([[InlineKeyboardButton(lang.OPEN_LINK, url=estate[1])]])
+                await update.message.reply_text(msg_to_sent, reply_markup=link_kb)
             else:
                 continue
     else:
@@ -294,7 +300,7 @@ async def del_history_kb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         print(e)
 
 
-async def get_day_history_kb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def get_history_kb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await find_and_set_lang(update, context)
     lang = LANGUAGES[context.user_data['language']]
 
@@ -321,6 +327,35 @@ async def get_day_history_kb(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.callback_query.message.reply_text(lang.ERROR_SET_DATA)
 
 
+async def my_parameters(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await find_and_set_lang(update, context)
+    lang = LANGUAGES[context.user_data['language']]
+
+    try:
+        user = await get_user_by_chat_id(update.message.chat_id)
+    except AttributeError:
+        user = await get_user_by_chat_id(update.callback_query.from_user.id)
+
+    match user.city:
+        case "limassol":
+            city = lang.LIMASSOL
+        case "larnaka":
+            city = lang.LARNAKA
+        case "paphos":
+            city = lang.PAPHOS
+        case "nicosia":
+            city = lang.NICOSIA
+        case _:
+            city = lang.CYPRUS
+
+    message = await update.message.reply_text(
+        f"{lang.MY_PARAMETERS} \n\n"
+        f"{lang.CITY}: {city} \n"
+        f"{lang.MIN_PRICE} {user.min_price}€ "
+        f"{lang.MAX_PRICE} {user.max_price}€\n{lang.PARAM}",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    context.user_data['set_all_params'] = message.message_id
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -345,7 +380,7 @@ async def set_bot_commands(application: Application) -> None:
     commands = [
         BotCommand("new_parameters", lang.NEW_PARAM_COMMAND),
         BotCommand("language", lang.CHANGE_LANGUAGE_COMMAND),
-        BotCommand("get_day_history", lang.GET_HISTORY_COMMAND),
+        BotCommand("get_history", lang.GET_HISTORY_COMMAND),
         BotCommand("my_parameters", lang.MY_PARAM_COMMAND),
         BotCommand("stop", lang.STOP_UPDATE_COMMAND),
         BotCommand("info", lang.INFO_BOT_COMMAND)
@@ -353,8 +388,6 @@ async def set_bot_commands(application: Application) -> None:
 
     await application.bot.set_my_commands(commands)
     await application.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
-
-
 
 
 async def on_startup(application: Application) -> None:
@@ -382,10 +415,11 @@ def main() -> None:
     application.add_handler(CommandHandler('info', info))
     application.add_handler(CommandHandler('stop', stop))
     application.add_handler(CommandHandler('language', set_language))
-    application.add_handler(CommandHandler('get_day_history', get_day_history))
+    application.add_handler(CommandHandler('get_history', get_history))
+    application.add_handler(CommandHandler('my_parameters', my_parameters))
 
     application.add_handler(CallbackQueryHandler(get_language, pattern='^lang_(en|el|ru)$'))
-    application.add_handler(CallbackQueryHandler(get_day_history_kb, pattern='^get_day_history_kb$'))
+    application.add_handler(CallbackQueryHandler(get_history_kb, pattern='^get_history_kb$'))
     application.add_handler(CallbackQueryHandler(del_history_kb, pattern='^del_history_kb$'))
 
     # Admin command

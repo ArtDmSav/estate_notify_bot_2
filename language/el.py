@@ -8,7 +8,8 @@ LARNAKA = 'Λάρνακα'
 PAPHOS = 'Πάφος'
 NICOSIA = 'Λευκωσία'
 LIMASSOL = 'Λεμεσός'
-CYPRUS = 'Όλη η Κύπρος'
+CYPRUS = 'Υπόλοιπη Κύπρος'
+MY_PARAMETERS = "Οι παράμετροί σας:"
 INVALID_INPUT_MSG = "Μη έγκυρη είσοδος"
 INVALID_PRICE_INPUT_MSG = 'Μη έγκυρη είσοδος\nΕισάγετε έναν αριθμό από 100 έως 999999, χωρίς κενά και άλλα σύμβολα'
 MIN_PRICE = 'Τιμή ενοικίου από '
@@ -23,7 +24,6 @@ LINK_TO_ADD = '\n------------------------------\nΣύνδεσμος προς τ�
 LANGUAGE_SET = "Αλλάξτε γλώσσα /language"
 PARAM = '\nΟρίστε νέες παραμέτρους /new_parameters'
 GET_DAY_HISTORY = 'GET_DAY_HISTORY'
-
 OPEN_LINK = "Μετάβαση στην αγγελία"
 INFO_BOT_COMMAND = "Πληροφορίες για το bot"
 STOP_UPDATE_COMMAND = "Διακοπή ενημερώσεων"

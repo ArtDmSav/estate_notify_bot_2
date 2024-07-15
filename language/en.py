@@ -8,7 +8,8 @@ LARNAKA = 'Larnaca'
 PAPHOS = 'Paphos'
 NICOSIA = 'Nicosia'
 LIMASSOL = 'Limassol'
-CYPRUS = 'All Cyprus'
+CYPRUS = 'Rest of Cyprus'
+MY_PARAMETERS = "Your parameters:"
 INVALID_INPUT_MSG = "Invalid input"
 INVALID_PRICE_INPUT_MSG = 'Invalid input\nEnter a number from 100 to 999999, without spaces and other symbols'
 MIN_PRICE = 'Rental price from '
@@ -23,7 +24,6 @@ LINK_TO_ADD = '\n------------------------------\nLink to the ad ---> '
 LANGUAGE_SET = "Change language /language"
 PARAM = '\nSet new parameters /new_parameters'
 GET_DAY_HISTORY = 'GET_DAY_HISTORY'
-
 OPEN_LINK = "Go to listing"
 INFO_BOT_COMMAND = "Bot Information"
 STOP_UPDATE_COMMAND = "Stop Updates"
