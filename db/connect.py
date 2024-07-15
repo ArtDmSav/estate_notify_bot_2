@@ -190,6 +190,14 @@ async def update_user_language(chat_id: int, language: str) -> None:
 # Admin functions
 # ----------------------------------------------
 
+async def get_all_users():
+    async with async_session() as session:
+        async with session.begin():
+            result = await session.execute(select(User))
+            users = result.scalars().all()
+            return users
+
+
 async def get_last_10_estate_ids():
     async with async_session() as session:
         async with session.begin():

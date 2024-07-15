@@ -9,7 +9,8 @@ from telegram.ext import CallbackQueryHandler, Application, CommandHandler, Cont
 from config.data import BOT_TOKEN, LANGUAGES, DEFAULT_LANGUAGE, SLEEP
 from db.connect import deactivate_user, get_active_users, get_estates, update_last_msg_id, get_user_by_chat_id, \
     get_estates_in_time_range, update_user_language, get_user_language, insert_user_tg
-from parts.admin import admin_commands, get_last_10_eids, get_estate_id, get_estate_group_msg_id
+from parts.admin import admin_commands, get_last_10_eids, get_estate_id, get_estate_group_msg_id, get_user_list, \
+    post_ad_post, ad_check_cmd_in_media
 
 CITY, MIN_VALUE, MAX_VALUE = range(3)
 
@@ -423,9 +424,12 @@ async def update_loop(application: Application) -> None:
                     case 'el':
                         msg = estate.msg_el
                 try:
-                    msg_to_sent = f'{msg}{lang.LINK_TO_ADD}{estate.url}'
+                    msg_to_sent = f'{msg}\n{estate.url}'
                     if len(msg_to_sent) <= 4095:
-                        await application.bot.send_message(chat_id=user.chat_id, text=msg_to_sent)
+                        # await application.bot.send_message(chat_id=user.chat_id, text=msg_to_sent)
+
+                        link_kb = InlineKeyboardMarkup([[InlineKeyboardButton(lang.OPEN_LINK, url=estate.url)]])
+                        await application.bot.send_message(chat_id=user.chat_id, text=msg_to_sent, reply_markup=link_kb)
 
                 except TelegramError as e:
                     await deactivate_user(user.chat_id)
@@ -480,6 +484,11 @@ def main() -> None:
     application.add_handler(CommandHandler('eid', get_last_10_eids))
     application.add_handler(CommandHandler('msgid', get_estate_id))
     application.add_handler(CommandHandler('groupid', get_estate_group_msg_id))
+    application.add_handler(CommandHandler('get_user_list', get_user_list))
+    application.add_handler(CommandHandler('ad', post_ad_post))
+
+    application.add_handler(
+        MessageHandler((filters.PHOTO | filters.VIDEO) & filters.ChatType.PRIVATE, ad_check_cmd_in_media))
 
     application.add_handler(conv_handler)
 

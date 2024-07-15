@@ -23,6 +23,7 @@ LANGUAGE_SET = "Поменять язык /language"
 INFO_BOT_COMMAND = "Информация о работе бота"
 PARAM = '\nЗадать новые параметры /new_parameters'
 
+OPEN_LINK = 'Перейти к объявлению'
 INFO_BOT_COMMAND = "Информация о боте"
 STOP_UPDATE_COMMAND = 'Остановить рассылку'
 MY_PARAM_COMMAND = 'Мои параметры'

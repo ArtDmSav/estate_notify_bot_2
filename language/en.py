@@ -24,6 +24,7 @@ LANGUAGE_SET = "Change language /language"
 PARAM = '\nSet new parameters /new_parameters'
 GET_DAY_HISTORY = 'GET_DAY_HISTORY'
 
+OPEN_LINK = "Go to listing"
 INFO_BOT_COMMAND = "Bot Information"
 STOP_UPDATE_COMMAND = "Stop Updates"
 MY_PARAM_COMMAND = "My Parameters"

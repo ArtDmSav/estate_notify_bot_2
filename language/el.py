@@ -24,6 +24,7 @@ LANGUAGE_SET = "Αλλάξτε γλώσσα /language"
 PARAM = '\nΟρίστε νέες παραμέτρους /new_parameters'
 GET_DAY_HISTORY = 'GET_DAY_HISTORY'
 
+OPEN_LINK = "Μετάβαση στην αγγελία"
 INFO_BOT_COMMAND = "Πληροφορίες για το bot"
 STOP_UPDATE_COMMAND = "Διακοπή ενημερώσεων"
 MY_PARAM_COMMAND = "Οι παράμετροί μου"
