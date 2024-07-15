@@ -92,7 +92,6 @@ async def post_ad_post(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 print(f"------------------------{e}----------------------")
 
             except TelegramError as e:
-                await deactivate_user(user.chat_id)
                 print(f"------------------------{e}----------------------")
                 continue
     else:
