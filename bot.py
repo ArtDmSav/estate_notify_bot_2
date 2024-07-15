@@ -2,15 +2,15 @@ import asyncio
 
 from telegram import Update, BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, \
     MenuButtonCommands, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from telegram.error import TelegramError
 from telegram.ext import CallbackQueryHandler, Application, CommandHandler, ContextTypes, MessageHandler, filters, \
     ConversationHandler
 
-from config.data import BOT_TOKEN, LANGUAGES, DEFAULT_LANGUAGE, SLEEP
-from db.connect import deactivate_user, get_active_users, get_estates, update_last_msg_id, get_user_by_chat_id, \
+from config.data import BOT_TOKEN, LANGUAGES, DEFAULT_LANGUAGE
+from db.connect import deactivate_user, get_user_by_chat_id, \
     get_estates_in_time_range, update_user_language, get_user_language, insert_user_tg
 from parts.admin import admin_commands, get_last_10_eids, get_estate_id, get_estate_group_msg_id, get_user_list, \
     post_ad_post, ad_check_cmd_in_media
+from parts.sending_msg import update_loop
 
 CITY, MIN_VALUE, MAX_VALUE = range(3)
 
@@ -321,50 +321,6 @@ async def get_day_history_kb(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await update.callback_query.message.reply_text(lang.ERROR_SET_DATA)
 
 
-async def update_loop(application: Application) -> None:
-    count = 0
-    while True:
-        count += 1
-        print(f'================== --- {count} --- ==================')
-        users = await get_active_users()
-        for user in users:
-            flag = False
-            print(f'user = {user.chat_id}')
-            last_msg_id = user.last_msg_id
-            estates = await get_estates(user.last_msg_id, user.city, user.min_price, user.max_price)
-            for estate in estates:
-                flag = True
-                last_msg_id = estate.id
-                print('estate_id = ', estate.id)
-                lang = LANGUAGES[user.set_language]
-                msg = ''
-                match user.set_language:
-                    case 'ru':
-                        msg = estate.msg_ru
-                    case 'en':
-                        msg = estate.msg_en
-                    case 'el':
-                        msg = estate.msg_el
-                try:
-                    msg_to_sent = f'{msg}{lang.LINK_TO_ADD}{estate.url}'
-                    if len(msg_to_sent) <= 4095:
-                        await application.bot.send_message(chat_id=user.chat_id, text=msg_to_sent)
-
-                except TelegramError as e:
-                    await deactivate_user(user.chat_id)
-                    print(f"------------------------{e}----------------------")
-            if flag:
-                try:
-                    lang = LANGUAGES[user.set_language]
-                    await application.bot.send_message(chat_id=user.chat_id,
-                                                       text=f'{lang.STOP_UPDATE}{lang.PARAM}')
-
-                except TelegramError as e:
-                    await deactivate_user(user.chat_id)
-                    print(f"------------------------{e}----------------------")
-            await update_last_msg_id(user.chat_id, last_msg_id)
-
-        await asyncio.sleep(SLEEP)
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -399,53 +355,6 @@ async def set_bot_commands(application: Application) -> None:
     await application.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
 
 
-async def update_loop(application: Application) -> None:
-    count = 0
-    while True:
-        count += 1
-        print(f'================== --- {count} --- ==================')
-        users = await get_active_users()
-        for user in users:
-            flag = False
-            print(f'user = {user.chat_id}')
-            last_msg_id = user.last_msg_id
-            estates = await get_estates(user.last_msg_id, user.city, user.min_price, user.max_price)
-            for estate in estates:
-                flag = True
-                last_msg_id = estate.id
-                print('estate_id = ', estate.id)
-                lang = LANGUAGES[user.language]
-                msg = ''
-                match user.language:
-                    case 'ru':
-                        msg = estate.msg_ru
-                    case 'en':
-                        msg = estate.msg_en
-                    case 'el':
-                        msg = estate.msg_el
-                try:
-                    msg_to_sent = f'{msg}\n{estate.url}'
-                    if len(msg_to_sent) <= 4095:
-                        # await application.bot.send_message(chat_id=user.chat_id, text=msg_to_sent)
-
-                        link_kb = InlineKeyboardMarkup([[InlineKeyboardButton(lang.OPEN_LINK, url=estate.url)]])
-                        await application.bot.send_message(chat_id=user.chat_id, text=msg_to_sent, reply_markup=link_kb)
-
-                except TelegramError as e:
-                    await deactivate_user(user.chat_id)
-                    print(f"------------------------{e}----------------------")
-            if flag:
-                try:
-                    lang = LANGUAGES[user.language]
-                    await application.bot.send_message(chat_id=user.chat_id,
-                                                       text=f'{lang.STOP_UPDATE}{lang.PARAM}')
-
-                except TelegramError as e:
-                    await deactivate_user(user.chat_id)
-                    print(f"------------------------{e}----------------------")
-            await update_last_msg_id(user.chat_id, last_msg_id)
-
-        await asyncio.sleep(60)
 
 
 async def on_startup(application: Application) -> None:

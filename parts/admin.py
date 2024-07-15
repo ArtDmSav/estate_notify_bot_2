@@ -1,10 +1,12 @@
 import re
 
 from telegram import Update, InputMediaVideo, InputMediaPhoto
+from telegram.error import TelegramError
 from telegram.ext import ContextTypes
 
 from config.data import ADMIN
-from db.connect import get_last_10_estate_ids, get_estate_by_id, get_estate_by_group_id_and_msg_id, get_all_users
+from db.connect import get_last_10_estate_ids, get_estate_by_id, get_estate_by_group_id_and_msg_id, get_all_users, \
+    deactivate_user
 
 
 async def admin_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -76,14 +78,19 @@ async def post_ad_post(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
         users = await get_all_users()
         for user in users:
+            try:
+                if media:
+                    print('if media true')
+                    await context.bot.send_media_group(chat_id=user.chat_id, media=media)
+                else:
+                    if caption:
+                        print('if media =   fals and captio = true')
+                        await context.bot.send_message(chat_id=user.chat_id, text=caption)
 
-            if media:
-                print('if media true')
-                await context.bot.send_media_group(chat_id=user.chat_id, media=media)
-            else:
-                if caption:
-                    print('if media =   fals and captio = true')
-                    await context.bot.send_message(chat_id=user.chat_id, text=caption)
+            except TelegramError as e:
+                await deactivate_user(user.chat_id)
+                print(f"------------------------{e}----------------------")
+                continue
     else:
         await update.message.reply_text('Access ERROR')
 
