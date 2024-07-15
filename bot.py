@@ -413,9 +413,9 @@ async def update_loop(application: Application) -> None:
                 flag = True
                 last_msg_id = estate.id
                 print('estate_id = ', estate.id)
-                lang = LANGUAGES[user.set_language]
+                lang = LANGUAGES[user.language]
                 msg = ''
-                match user.set_language:
+                match user.language:
                     case 'ru':
                         msg = estate.msg_ru
                     case 'en':
