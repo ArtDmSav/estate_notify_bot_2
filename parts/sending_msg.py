@@ -4,7 +4,7 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.error import TelegramError
 from telegram.ext import Application
 
-from config.data import LANGUAGES
+from config.data import LANGUAGES, SLEEP
 from db.connect import get_active_users, get_estates, deactivate_user, update_last_msg_id
 
 
@@ -54,7 +54,7 @@ async def update_loop(application: Application) -> None:
                     print(f"------------------------{e}----------------------")
             await update_last_msg_id(user.chat_id, last_msg_id)
 
-        await asyncio.sleep(60)
+        await asyncio.sleep(SLEEP)
 
 #
 # async def update_loop(application: Application) -> None:

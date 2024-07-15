@@ -27,4 +27,4 @@ LANGUAGES = {
 }
 DEFAULT_LANGUAGE = 'en'
 
-SLEEP = 300  # How often will be check db and sent msgs (sec)
+SLEEP = 600  # How often will be check db and sent msgs (sec)
