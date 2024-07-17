@@ -18,7 +18,7 @@ async def update_loop(application: Application) -> None:
             flag = False
             last_msg_id = user.last_msg_id
             estates = await get_estates(user.last_msg_id, user.city, user.min_price, user.max_price)
-            if estates[0]:
+            if estates[0] is not None:
                 print(f'for user = {user.chat_id}')
                 for estate in estates:
                     flag = True
