@@ -36,7 +36,7 @@ async def user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         match = re.match(r'/u_info\s+@?(\w{5,32})', update.message.text)
         if match:
             username = match.group(1)
-            user = get_user_info(username, True)
+            user = get_user_info(username)
             if user:
                 await update.message.reply_text(f'{"*" * 33}\n'
                                                 f'@{username}  -  {user.chat_id}\n'
