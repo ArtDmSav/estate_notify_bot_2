@@ -5,9 +5,7 @@ from language import en, ru, el
 
 # Absolut path
 dir_path = Path.cwd()
-print(dir_path)
 path = Path(dir_path, 'config', 'config.ini')
-print(path)
 config = configparser.ConfigParser()
 config.read(path)
 

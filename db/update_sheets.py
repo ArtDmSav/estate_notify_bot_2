@@ -2,7 +2,7 @@ import asyncio
 
 import asyncpg
 
-DATABASE_URL = "postgresql://admin:password@localhost/estate"
+from config.data import DATABASE_URL
 
 
 async def add_columns():
