@@ -29,6 +29,6 @@ LANGUAGES = {
 }
 DEFAULT_LANGUAGE = 'en'
 
-SLEEP = 60 * 60 * 3  # How often will check db and sent msgs (sec) = seconds * minutes * hours
-TIME_SEND_MSG = 60 * 60 * 3  # Send msgs every 3 h for usual user
-TIME_SEND_VIP_MSG = 60 * 5  # Send msgs every 5 min for vip
+SLEEP = 60 * 3  # How often will check db and sent msgs (sec) = seconds * minutes * hours
+TIME_SEND_MSG = 60 * 60 * 3  # Send msgs every 3 h for usual user (sec)
+TIME_SEND_VIP_MSG = 60 * 5  # Send msgs every 5 min for vip (sec)

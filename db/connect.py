@@ -92,11 +92,21 @@ async def deactivate_user(chat_id) -> bool:
                 return False
 
 
-async def get_active_users() -> User:
+async def get_active_usual_users() -> User:
     async with async_session() as session:
         async with session.begin():
             result = await session.execute(
-                select(User).where(User.status == True)
+                select(User).where((User.status == True) & (User.vip != True))
+            )
+            active_users = result.scalars().all()
+            return active_users
+
+
+async def get_active_vip_users() -> User:
+    async with async_session() as session:
+        async with session.begin():
+            result = await session.execute(
+                select(User).where((User.status == True) & (User.vip == True))
             )
             active_users = result.scalars().all()
             return active_users
