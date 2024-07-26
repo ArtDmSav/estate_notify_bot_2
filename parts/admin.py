@@ -6,7 +6,7 @@ from telegram.ext import ContextTypes
 
 from config.data import ADMIN
 from db.connect import get_last_10_estate_ids, get_estate_by_id, get_estate_by_group_id_and_msg_id, get_all_users, \
-    deactivate_user
+    deactivate_user, vip_status
 
 
 async def admin_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -19,11 +19,46 @@ async def admin_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             /eid - get last 10 Estate.id Ex: + ''\n
             /msgid - get msg with Estate.id Ex: + ' 357'\n
             /groupid - get msg with group_id and msg_id Ex: + ' dom_com_cy 105200'\n
-            
+            /add_vip @username - u get msgs more often
+            /deact_vip @username - deactivate vip status
             """
         await update.message.reply_text(menu_text)
     else:
         await update.message.reply_text('Access ERROR')
+
+
+async def activate_vip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_id = update.message.from_user.id
+
+    if user_id == ADMIN:
+        # Используем регулярное выражение для извлечения аргумента после команды /add_vip
+        match = re.match(r'/add_vip\s+@?(\w{5,32})', update.message.text)
+        if match:
+            username = match.group(1)
+            if await vip_status(username, True):
+                await update.message.reply_text(f'Статус успешно обнавлен!')
+            else:
+                await update.message.reply_text(f'Ошибка!\n@{username} - не найдет в БД')
+
+        else:
+            await update.message.reply_text(f'Ошибка в воде команды, попробуйте снова.')
+
+
+async def deactivate_vip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_id = update.message.from_user.id
+
+    if user_id == ADMIN:
+        # Используем регулярное выражение для извлечения аргумента после команды /add_vip
+        match = re.match(r'/add_vip\s+@?(\w{5,32})', update.message.text)
+        if match:
+            username = match.group(1)
+            if await vip_status(username, False):
+                await update.message.reply_text(f'Статус успешно обнавлен!')
+            else:
+                await update.message.reply_text(f'Ошибка!\n@{username} - не найдет в БД')
+
+        else:
+            await update.message.reply_text(f'Ошибка в воде команды, попробуйте снова.')
 
 
 async def get_user_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

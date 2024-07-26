@@ -29,7 +29,8 @@ async def get_last_estate_id() -> int:
             return last_id if last_id is not None else 0
 
 
-async def insert_user_tg(chat_id: int, city: str, min_value: int, max_value: int, language: str, status: bool = True):
+async def insert_user_tg(chat_id: int, username: str, city: str, min_value: int, max_value: int, language: str,
+                         status: bool = True):
     last_estate_id = await get_last_estate_id()
     async with async_session() as session:
         async with session.begin():
@@ -45,6 +46,7 @@ async def insert_user_tg(chat_id: int, city: str, min_value: int, max_value: int
                     update(User).
                     where(User.chat_id == chat_id).
                     values(
+                        username=username,
                         city=city,
                         min_price=min_value,
                         max_price=max_value,
@@ -58,6 +60,7 @@ async def insert_user_tg(chat_id: int, city: str, min_value: int, max_value: int
                 # Добавление нового пользователя
                 new_user = User(
                     chat_id=chat_id,
+                    username=username,
                     city=city,
                     min_price=min_value,
                     max_price=max_value,
@@ -84,6 +87,29 @@ async def deactivate_user(chat_id) -> bool:
                     update(User).
                     where(User.chat_id == chat_id).
                     values(status=False)
+                )
+                await session.execute(stmt)
+                await session.commit()
+                return True
+            else:
+                return False
+
+
+async def vip_status(username: str, status: bool) -> bool:
+    async with async_session() as session:
+        async with session.begin():
+            # Поиск пользователя по chat_id
+            result = await session.execute(
+                select(User).where(User.username == username)
+            )
+            user = result.scalar_one_or_none()
+
+            if user:
+                # Обновление статуса пользователя
+                stmt = (
+                    update(User).
+                    where(User.username == username).
+                    values(vip=status)
                 )
                 await session.execute(stmt)
                 await session.commit()

@@ -9,7 +9,7 @@ from config.data import BOT_TOKEN, LANGUAGES, DEFAULT_LANGUAGE
 from db.connect import deactivate_user, get_user_by_chat_id, \
     get_estates_in_time_range, update_user_language, get_user_language, insert_user_tg
 from parts.admin import admin_commands, get_last_10_eids, get_estate_id, get_estate_group_msg_id, get_user_list, \
-    post_ad_post, ad_check_cmd_in_media
+    post_ad_post, ad_check_cmd_in_media, activate_vip, deactivate_vip
 from parts.sending_msg import update_loop
 
 CITY, MIN_VALUE, MAX_VALUE = range(3)
@@ -207,6 +207,7 @@ async def max_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             context.user_data['max_value'] = max_value
 
         await insert_user_tg(update.message.chat_id,
+                             update.message.from_user.username,
                              context.user_data['city'],
                              int(context.user_data['min_value']),
                              int(context.user_data['max_value']),
@@ -428,6 +429,8 @@ def main() -> None:
     application.add_handler(CommandHandler('msgid', get_estate_id))
     application.add_handler(CommandHandler('groupid', get_estate_group_msg_id))
     application.add_handler(CommandHandler('get_user_list', get_user_list))
+    application.add_handler(CommandHandler('add_vip', activate_vip))
+    application.add_handler(CommandHandler('deact_vip', deactivate_vip))
     application.add_handler(CommandHandler('ad', post_ad_post))
 
     application.add_handler(
