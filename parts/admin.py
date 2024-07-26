@@ -19,7 +19,7 @@ async def admin_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             /eid - get last 10 Estate.id Ex: + ''\n
             /msgid - get msg with Estate.id Ex: + ' 357'\n
             /groupid - get msg with group_id and msg_id Ex: + ' dom_com_cy 105200'\n
-            /u_list - get user list\n
+            
             """
         await update.message.reply_text(menu_text)
     else:

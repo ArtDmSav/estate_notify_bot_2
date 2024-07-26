@@ -2,14 +2,12 @@ from datetime import datetime
 
 from databases import Database
 from sqlalchemy import (
-    Column, Integer, BigInteger, String, Boolean, DateTime, Text, Time
+    Column, Integer, BigInteger, String, Boolean, DateTime, Text, Time, func
 )
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import declarative_base
 
-from config.data import DB_LOGIN, DB_PASSWORD, DB_NAME
-
-DATABASE_URL = f"postgresql+asyncpg://{DB_LOGIN}:{DB_PASSWORD}@localhost/{DB_NAME}"
+from config.data import DATABASE_URL
 
 database = Database(DATABASE_URL)
 Base = declarative_base()
@@ -32,6 +30,18 @@ class User(Base):
     time_finish_sent = Column(Time)
     vip = Column(Boolean, default=True)
 
+    # NEW fields
+    pet = Column(Boolean, default=False)
+    new_building = Column(Boolean, default=False)
+    access = Column(Boolean, default=False)
+    username = Column(String(32))
+    end_of_access = Column(DateTime)
+    blocked = Column(Integer)
+    advt = Column(Boolean)
+    last_advt_time = Column(DateTime, default=func.now())
+    last_update_msgs_time = Column(DateTime, default=func.now())
+    reg_dt = Column(DateTime, default=func.now())
+
 
 class Estate(Base):
     __tablename__ = "estates"
@@ -51,6 +61,10 @@ class Estate(Base):
     msg_ru = Column(Text)
     msg_en = Column(Text)
     msg_el = Column(Text)
+
+    # NEW fields
+    pet = Column(Boolean)
+    new_building = Column(Boolean)
 
 
 async def create_tables():
