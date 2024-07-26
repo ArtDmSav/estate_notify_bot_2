@@ -4,7 +4,7 @@ from pathlib import Path
 from language import en, ru, el
 
 # Absolut path
-dir_path = Path.cwd().parent
+dir_path = Path.cwd()
 print(dir_path)
 path = Path(dir_path, 'config', 'config.ini')
 print(path)
