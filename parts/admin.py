@@ -22,6 +22,7 @@ async def admin_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             /add_vip @username - u get msgs more often
             /deact_vip @username - deactivate vip status
             /u_info @username - get user data card
+            /get_user_list - get_user list
             """
         await update.message.reply_text(menu_text)
     else:
@@ -112,7 +113,7 @@ async def get_user_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         count = 0
         for user in users:
             count += 1
-            await update.message.reply_text(f'{count}. {user.chat_id} {user.status}')
+            await update.message.reply_text(f'{count}. {user.chat_id} @{user.username} {user.status}')
     else:
         await update.message.reply_text('Access ERROR')
 
