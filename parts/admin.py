@@ -6,7 +6,7 @@ from telegram.ext import ContextTypes
 
 from config.data import ADMIN
 from db.connect import get_last_10_estate_ids, get_estate_by_id, get_estate_by_group_id_and_msg_id, get_all_users, \
-    deactivate_user, vip_status
+    deactivate_user, vip_status, get_user_info
 
 
 async def admin_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -21,10 +21,53 @@ async def admin_commands(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             /groupid - get msg with group_id and msg_id Ex: + ' dom_com_cy 105200'\n
             /add_vip @username - u get msgs more often
             /deact_vip @username - deactivate vip status
+            /u_info @username - get user data card
             """
         await update.message.reply_text(menu_text)
     else:
         await update.message.reply_text('Access ERROR')
+
+
+async def user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_id = update.message.from_user.id
+
+    if user_id == ADMIN:
+        # Используем регулярное выражение для извлечения аргумента после команды /u_info
+        match = re.match(r'/u_info\s+@?(\w{5,32})', update.message.text)
+        if match:
+            username = match.group(1)
+            user = get_user_info(username, True)
+            if user:
+                await update.message.reply_text(f'{"*" * 33}\n'
+                                                f'@{username}  -  {user.chat_id}\n'
+                                                f'city = {user.city}\n'
+                                                f'min_price =  {user.min_price}\n'
+                                                f'max_price =  {user.max_price}\n'
+                                                f'status =  {user.status}\n'
+                                                f'last_msg_id =  {user.last_msg_id}\n'
+                                                f'language =  {user.language}\n'
+                                                f'vip =  {user.vip}\n'
+                                                f'last_update_msgs_time =  {user.last_update_msgs_time}\n'
+                                                f'reg_dt =  {user.reg_dt}\n'
+                                                f'pet =  {user.pet}\n'
+                                                f'new_building =  {user.new_building}\n'
+                                                f'access = {user.access}\n'
+                                                f'end_of_access = {user.end_of_access}\n'
+                                                f'blocked = {user.blocked}\n'
+                                                f'advt = {user.advt}\n'
+                                                f'last_advt_time = {user.last_advt_time}\n'
+                                                f'district = {user.district}\n'
+                                                f'rooms = {user.rooms}\n'
+                                                f'time_start_sent = {user.time_start_sent}\n'
+                                                f'time_finish_sent = {user.time_finish_sent}\n'
+                                                f'{"*" * 33}\n'
+                                                )
+
+            else:
+                await update.message.reply_text(f'Ошибка!\n@{username} - не найдет в БД')
+
+        else:
+            await update.message.reply_text(f'Ошибка в воде команды, попробуйте снова.')
 
 
 async def activate_vip(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

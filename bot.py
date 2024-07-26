@@ -9,7 +9,7 @@ from config.data import BOT_TOKEN, LANGUAGES, DEFAULT_LANGUAGE
 from db.connect import deactivate_user, get_user_by_chat_id, \
     get_estates_in_time_range, update_user_language, get_user_language, insert_user_tg
 from parts.admin import admin_commands, get_last_10_eids, get_estate_id, get_estate_group_msg_id, get_user_list, \
-    post_ad_post, ad_check_cmd_in_media, activate_vip, deactivate_vip
+    post_ad_post, ad_check_cmd_in_media, activate_vip, deactivate_vip, user_info
 from parts.sending_msg import update_loop
 
 CITY, MIN_VALUE, MAX_VALUE = range(3)
@@ -432,6 +432,7 @@ def main() -> None:
     application.add_handler(CommandHandler('add_vip', activate_vip))
     application.add_handler(CommandHandler('deact_vip', deactivate_vip))
     application.add_handler(CommandHandler('ad', post_ad_post))
+    application.add_handler(CommandHandler('u_info', user_info))
 
     application.add_handler(
         MessageHandler((filters.PHOTO | filters.VIDEO) & filters.ChatType.PRIVATE, ad_check_cmd_in_media))

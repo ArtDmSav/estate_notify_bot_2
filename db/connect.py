@@ -118,6 +118,40 @@ async def vip_status(username: str, status: bool) -> bool:
                 return False
 
 
+async def rewrite_update_msgs_time(chat_id: int, dt: datetime) -> bool:
+    async with async_session() as session:
+        async with session.begin():
+            # Поиск пользователя по chat_id
+            result = await session.execute(
+                select(User).where(User.chat_id == chat_id)
+            )
+            user = result.scalar_one_or_none()
+
+            if user:
+                # Обновление статуса пользователя
+                stmt = (
+                    update(User).
+                    where(User.chat_id == chat_id).
+                    values(last_update_msgs_time=dt)
+                )
+                await session.execute(stmt)
+                await session.commit()
+                return True
+            else:
+                return False
+
+
+async def get_user_info(username: str) -> User:
+    async with async_session() as session:
+        async with session.begin():
+            result = await session.execute(
+                select(User).
+                where(User.username == username)
+            )
+            user = result.scalar_one_or_none()
+            return user
+
+
 async def get_active_usual_users() -> User:
     async with async_session() as session:
         async with session.begin():
