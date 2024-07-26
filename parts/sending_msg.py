@@ -32,7 +32,7 @@ async def update_loop(application: Application) -> None:
                     print(f"Error = не удачная перезапись времени отправки последнего сообщения @{user.username}")
 
         print(f'================== --- {count} --- ==================')
-        print(f'============= --- {datetime.now()} --- =============')
+        print(f'===--- {datetime.now()} --- ===')
         await asyncio.sleep(SLEEP)
 
 
