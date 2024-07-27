@@ -5,7 +5,7 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.error import TelegramError, Forbidden
 from telegram.ext import Application
 
-from config.data import LANGUAGES, SLEEP, TIME_SEND_MSG
+from config.data import LANGUAGES, SLEEP, TIME_SEND_MSG, TIME_SEND_VIP_MSG
 from db.connect import get_estates, deactivate_user, update_last_msg_id, get_active_usual_users, get_active_vip_users, \
     rewrite_update_msgs_time
 from db.create import User
@@ -20,7 +20,7 @@ async def update_loop(application: Application) -> None:
         now = datetime.now()
 
         for user in vip_users:
-            if (now - user.last_update_msgs_time) >= timedelta(seconds=TIME_SEND_MSG):
+            if (now - user.last_update_msgs_time) >= timedelta(seconds=TIME_SEND_VIP_MSG):
                 await send_msg_to_user(user, application)
                 if not await rewrite_update_msgs_time(user.chat_id, now):
                     print(f"Error = не удачная перезапись времени отправки последнего сообщения @{user.username}")
@@ -32,7 +32,7 @@ async def update_loop(application: Application) -> None:
                     print(f"Error = не удачная перезапись времени отправки последнего сообщения @{user.username}")
 
         print(f'================== --- {count} --- ==================')
-        print(f'===--- {datetime.now()} --- ===')
+        print(f'======--- {datetime.now()} --- ======')
         await asyncio.sleep(SLEEP)
 
 
