@@ -1,7 +1,9 @@
 import asyncio
+from asyncio import sleep
 
 from telegram import Update, BotCommand, InlineKeyboardButton, InlineKeyboardMarkup, \
     MenuButtonCommands, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram.error import NetworkError, RetryAfter
 from telegram.ext import CallbackQueryHandler, Application, CommandHandler, ContextTypes, MessageHandler, filters, \
     ConversationHandler
 
@@ -439,7 +441,21 @@ def main() -> None:
 
     application.add_handler(conv_handler)
 
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    retries = 5
+    while retries > 0:
+        try:
+            application.run_polling(allowed_updates=Update.ALL_TYPES)
+            break
+        except NetworkError as e:
+            print(f"NetworkError: {e}. Retrying in 5 seconds...")
+            retries -= 1
+            sleep(2)
+        except RetryAfter as e:
+            print(f"RetryAfter: {e}. Retrying in {e.retry_after} seconds...")
+            sleep(e.retry_after)
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            break
 
 
 if __name__ == "__main__":
